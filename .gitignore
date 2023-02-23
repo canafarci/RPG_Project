@@ -1,4 +1,3 @@
-
 # Ignore all files by default, but scan all directories.
 *
 !*/
@@ -17,8 +16,8 @@
 # Only allow .uasset and .umap files from /Content dir.
 # They're tracked by git-lfs, don't forget to track other
 # files if adding them here.
-!/Content/**/*.uasset
-!/Content/**/*.umap
+!/Content/Game/**/*.uasset
+!/Content/Game/**/*.umap
 
 # Allow any files from /RawContent dir.
 # Any file in /RawContent dir will be managed by git lfs.
@@ -29,8 +28,6 @@
 # Windows
 ehthumbs.db
 Thumbs.db
-/Intermediate
-/Content
 
 # Mac OS X
 .DS_Store
@@ -51,5 +48,4 @@ Session.vim
 .netrwhist
 
 # Visual Studio
-.vscode
-
+.vs
