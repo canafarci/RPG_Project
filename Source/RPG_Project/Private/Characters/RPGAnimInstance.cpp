@@ -23,4 +23,5 @@ void URPGAnimInstance::NativeUpdateAnimation(float DeltaTime)
 	if (CharacterMovement == nullptr) return;
 
 	GroundSpeed = UKismetMathLibrary::VSizeXY(CharacterMovement->Velocity);
+	IsFalling = CharacterMovement->IsFalling();
 }

@@ -88,5 +88,6 @@ void ARPGCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 	PlayerInputComponent->BindAxis(FName("MoveHorizontal"), this, &ARPGCharacter::MoveHorizontal);
 	PlayerInputComponent->BindAxis(FName("Turn"), this, &ARPGCharacter::Turn);
 	PlayerInputComponent->BindAxis(FName("LookUp"), this, &ARPGCharacter::LookUp);
+	PlayerInputComponent->BindAction(FName("Jump"), IE_Pressed, this, &ACharacter::Jump);
 }
 
