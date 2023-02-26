@@ -2,8 +2,8 @@
 
 
 #include "Items/Item.h"
-
 #include "RPG_PROJECT/DebugMacros.h"
+#include "Components/SphereComponent.h"
 // Sets default values
 AItem::AItem()
 {
@@ -12,6 +12,9 @@ AItem::AItem()
 
 	ItemMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("ItemMeshComponent"));
 	RootComponent = ItemMesh;
+
+	Sphere= CreateDefaultSubobject<USphereComponent>(TEXT("Sphere Collider"));
+	Sphere->SetupAttachment(GetRootComponent());
 }
 
 // Called when the game starts or when spawned
@@ -19,11 +22,23 @@ void AItem::BeginPlay()
 {
 	Super::BeginPlay();
 
+	Sphere->OnComponentBeginOverlap.AddDynamic(this, &AItem::OnItemBeginOverlap);
+	Sphere->OnComponentEndOverlap.AddDynamic(this, &AItem::OnItemEndOverlap);
 }
 
 float AItem::TransformSine()
 {
 	return Amplitude * FMath::Sin(RunningTime * TimeConstant);
+}
+
+void AItem::OnItemBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	UE_LOG(LogTemp, Warning, TEXT("BEGIN OVERLAP  \n this: %s, other: %s"), *OverlappedComponent->GetName(), *OtherActor->GetName());
+}
+
+void AItem::OnItemEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+{
+	UE_LOG(LogTemp, Warning, TEXT("END OVERLAP \n this: %s other: %s"), *OverlappedComponent->GetName(), *OtherComp->GetName())
 }
 
 // Called every frame
