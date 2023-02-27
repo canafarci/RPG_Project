@@ -6,6 +6,8 @@
 #include "Camera/CameraComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GroomComponent.h"
+#include "Items/Item.h"
+#include "Items/Weapons/Weapon.h"
 
 
 // Sets default values
@@ -65,6 +67,12 @@ void ARPGCharacter::MoveHorizontal(float Value)
 		AddMovementInput(Direction, Value);
 	}
 }
+void ARPGCharacter::Equip()
+{
+	AWeapon* Weapon = Cast<AWeapon>(OverlappingItem);
+	if (Weapon == nullptr) return;
+	Weapon->EquipWeapon(GetMesh(), FName("RightHandSocket"));
+}
 void ARPGCharacter::Turn(float Value)
 {
 	AddControllerYawInput(Value);
@@ -89,5 +97,6 @@ void ARPGCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 	PlayerInputComponent->BindAxis(FName("Turn"), this, &ARPGCharacter::Turn);
 	PlayerInputComponent->BindAxis(FName("LookUp"), this, &ARPGCharacter::LookUp);
 	PlayerInputComponent->BindAction(FName("Jump"), IE_Pressed, this, &ACharacter::Jump);
+	PlayerInputComponent->BindAction(FName("Equip"), IE_Pressed, this, &ARPGCharacter::Equip);
 }
 

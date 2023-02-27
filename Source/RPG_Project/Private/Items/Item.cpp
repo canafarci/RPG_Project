@@ -4,6 +4,7 @@
 #include "Items/Item.h"
 #include "RPG_PROJECT/DebugMacros.h"
 #include "Components/SphereComponent.h"
+#include "Characters/RPGCharacter.h"
 // Sets default values
 AItem::AItem()
 {
@@ -33,12 +34,19 @@ float AItem::TransformSine()
 
 void AItem::OnItemBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	UE_LOG(LogTemp, Warning, TEXT("BEGIN OVERLAP  \n this: %s, other: %s"), *OverlappedComponent->GetName(), *OtherActor->GetName());
+	//UE_LOG(LogTemp, Warning, TEXT("BEGIN OVERLAP  \n this: %s, other: %s"), *OverlappedComponent->GetName(), *OtherActor->GetName());
+	ARPGCharacter* Character = Cast<ARPGCharacter>(OtherActor);
+	if (Character == nullptr) return;
+	Character->SetOverlappingItem(this);
+
 }
 
 void AItem::OnItemEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
-	UE_LOG(LogTemp, Warning, TEXT("END OVERLAP \n this: %s other: %s"), *OverlappedComponent->GetName(), *OtherComp->GetName())
+	//UE_LOG(LogTemp, Warning, TEXT("END OVERLAP \n this: %s other: %s"), *OverlappedComponent->GetName(), *OtherComp->GetName())
+	ARPGCharacter* Character = Cast<ARPGCharacter>(OtherActor);
+	if (Character == nullptr) return;
+	Character->SetOverlappingItem(nullptr);
 }
 
 // Called every frame
