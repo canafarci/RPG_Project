@@ -72,6 +72,8 @@ void ARPGCharacter::Equip()
 	AWeapon* Weapon = Cast<AWeapon>(OverlappingItem);
 	if (Weapon == nullptr) return;
 	Weapon->EquipWeapon(GetMesh(), FName("RightHandSocket"));
+	EquipState = Weapon->WeaponEquipState;
+
 }
 void ARPGCharacter::Turn(float Value)
 {

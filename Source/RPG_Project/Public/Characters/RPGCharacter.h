@@ -4,7 +4,9 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "RPG_Project/Enums.h"
 #include "RPGCharacter.generated.h"
+
 
 UCLASS()
 class RPG_PROJECT_API ARPGCharacter : public ACharacter
@@ -25,6 +27,8 @@ protected:
 //VARIABLES
 private:
 	UPROPERTY(VisibleAnywhere)
+	ECharacterEquipState EquipState = ECharacterEquipState::ECES_Unequipped;
+	UPROPERTY(VisibleAnywhere)
 		class USpringArmComponent* CameraBoom;
 	UPROPERTY(VisibleAnywhere)
 		class UCameraComponent* ViewCamera;
@@ -37,4 +41,5 @@ private:
 //GETTERS-SETTERS
 public:
 	FORCEINLINE void SetOverlappingItem(AItem* item) { OverlappingItem = item; }
+	FORCEINLINE ECharacterEquipState GetCharacterEquipState() const { return EquipState; }
 };

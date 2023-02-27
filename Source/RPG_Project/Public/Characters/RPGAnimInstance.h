@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Animation/AnimInstance.h"
+#include "RPG_Project/Enums.h"
 #include "RPGAnimInstance.generated.h"
 
 /**
@@ -25,4 +26,6 @@ public:
 	float GroundSpeed;
 	UPROPERTY(BlueprintReadOnly, Category = Movement)
 	bool IsFalling;
+	UPROPERTY(BlueprintReadOnly, Category = "Movement | Character State")
+	ECharacterEquipState CharacterEquipState;
 };
