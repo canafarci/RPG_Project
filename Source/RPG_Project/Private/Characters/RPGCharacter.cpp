@@ -8,6 +8,7 @@
 #include "GroomComponent.h"
 #include "Items/Item.h"
 #include "Items/Weapons/Weapon.h"
+#include "Animation/AnimMontage.h"
 
 
 // Sets default values
@@ -75,6 +76,19 @@ void ARPGCharacter::Equip()
 	EquipState = Weapon->WeaponEquipState;
 
 }
+void ARPGCharacter::Attack()
+{
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	if (AnimInstance == nullptr || AttackMontage == nullptr) return;
+	//play montage
+	AnimInstance->Montage_Play(AttackMontage);
+	//randomize which part of the montage is to be played
+	FString SectionName = FString("Attack");
+	int32 Selection = FMath::RandRange(1, 5);
+	SectionName.AppendInt(Selection);
+	//play section of the montage
+	AnimInstance->Montage_JumpToSection(FName(SectionName));
+}
 void ARPGCharacter::Turn(float Value)
 {
 	AddControllerYawInput(Value);
@@ -88,7 +102,6 @@ void ARPGCharacter::LookUp(float Value)
 void ARPGCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
 }
 // Called to bind functionality to input
 void ARPGCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -100,5 +113,6 @@ void ARPGCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 	PlayerInputComponent->BindAxis(FName("LookUp"), this, &ARPGCharacter::LookUp);
 	PlayerInputComponent->BindAction(FName("Jump"), IE_Pressed, this, &ACharacter::Jump);
 	PlayerInputComponent->BindAction(FName("Equip"), IE_Pressed, this, &ARPGCharacter::Equip);
+	PlayerInputComponent->BindAction(FName("Attack"), IE_Pressed, this, &ARPGCharacter::Attack);
 }
 

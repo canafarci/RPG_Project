@@ -7,6 +7,13 @@
 #include "RPG_Project/Enums.h"
 #include "RPGCharacter.generated.h"
 
+//Forward declarations
+class USpringArmComponent;
+class UCameraComponent;
+class UGroomComponent;
+class AItem;
+class UInputComponent;
+class UAnimMontage;
 
 UCLASS()
 class RPG_PROJECT_API ARPGCharacter : public ACharacter
@@ -16,7 +23,7 @@ class RPG_PROJECT_API ARPGCharacter : public ACharacter
 public:
 	ARPGCharacter();
 	virtual void Tick(float DeltaTime) override;
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
 protected:
 	virtual void BeginPlay() override;
 	void MoveForward(float Value);
@@ -24,20 +31,25 @@ protected:
 	void LookUp(float Value);
 	void MoveHorizontal(float Value);
 	void Equip();
+	void Attack();
 //VARIABLES
 private:
 	UPROPERTY(VisibleAnywhere)
 	ECharacterEquipState EquipState = ECharacterEquipState::ECES_Unequipped;
 	UPROPERTY(VisibleAnywhere)
-		class USpringArmComponent* CameraBoom;
+		USpringArmComponent* CameraBoom;
 	UPROPERTY(VisibleAnywhere)
-		class UCameraComponent* ViewCamera;
+		UCameraComponent* ViewCamera;
 	UPROPERTY(VisibleAnywhere, Category = Hair)
-		class UGroomComponent* Hair;
+		UGroomComponent* Hair;
 	UPROPERTY(VisibleAnywhere, Category = Hair)
 		UGroomComponent* Eyebrows;
 	UPROPERTY(VisibleInstanceOnly)
-		 class AItem* OverlappingItem;
+		 AItem* OverlappingItem;
+	//--Animation Montages
+	UPROPERTY(EditDefaultsOnly, Category = Montages)
+	UAnimMontage* AttackMontage;
+
 //GETTERS-SETTERS
 public:
 	FORCEINLINE void SetOverlappingItem(AItem* item) { OverlappingItem = item; }
