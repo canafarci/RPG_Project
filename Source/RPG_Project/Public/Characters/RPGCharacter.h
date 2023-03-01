@@ -26,16 +26,26 @@ public:
 	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
 protected:
 	virtual void BeginPlay() override;
+	//--Callbacks for input
 	void MoveForward(float Value);
 	void Turn(float Value);
 	void LookUp(float Value);
 	void MoveHorizontal(float Value);
 	void Equip();
 	void Attack();
+	//--Play montage functions
+	void PlayAttackMontage();
+	UFUNCTION(BlueprintCallable)
+	void AttackEnd();
+	//--Helper  Functions
+	const bool CanAttack();
+
 //VARIABLES
 private:
 	UPROPERTY(VisibleAnywhere)
-	ECharacterEquipState EquipState = ECharacterEquipState::ECES_Unequipped;
+		ECharacterEquipState EquipState = ECharacterEquipState::ECES_Unequipped;
+	UPROPERTY(BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+		EActionState ActionState = EActionState::EAS_Unoccupied;
 	UPROPERTY(VisibleAnywhere)
 		USpringArmComponent* CameraBoom;
 	UPROPERTY(VisibleAnywhere)
@@ -48,7 +58,7 @@ private:
 		 AItem* OverlappingItem;
 	//--Animation Montages
 	UPROPERTY(EditDefaultsOnly, Category = Montages)
-	UAnimMontage* AttackMontage;
+		UAnimMontage* AttackMontage;
 
 //GETTERS-SETTERS
 public:

@@ -78,6 +78,12 @@ void ARPGCharacter::Equip()
 }
 void ARPGCharacter::Attack()
 {
+	if (!CanAttack()) return;
+	PlayAttackMontage();
+	ActionState = EActionState::EAS_Attacking;
+}
+void ARPGCharacter::PlayAttackMontage()
+{
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 	if (AnimInstance == nullptr || AttackMontage == nullptr) return;
 	//play montage
@@ -88,6 +94,14 @@ void ARPGCharacter::Attack()
 	SectionName.AppendInt(Selection);
 	//play section of the montage
 	AnimInstance->Montage_JumpToSection(FName(SectionName));
+}
+void ARPGCharacter::AttackEnd()
+{
+	ActionState = EActionState::EAS_Unoccupied;
+}
+const bool ARPGCharacter::CanAttack()
+{
+	return ActionState != EActionState::EAS_Attacking && EquipState != ECharacterEquipState::ECES_Unequipped;
 }
 void ARPGCharacter::Turn(float Value)
 {
