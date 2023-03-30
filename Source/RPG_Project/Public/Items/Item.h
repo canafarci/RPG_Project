@@ -4,7 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "RPG_Project/Enums.h"
 #include "Item.generated.h"
+
+//Forward Declarations
+class USphereComponent;
 
 UCLASS()
 class RPG_PROJECT_API AItem : public AActor
@@ -20,10 +24,6 @@ protected:
 	virtual void BeginPlay() override;
 	UFUNCTION(BlueprintPure)
 	float TransformSine();
-
-	template<typename T>
-	T Avg(T First, T Second);
-
 	UFUNCTION()
 	virtual void OnItemBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 	UFUNCTION()
@@ -34,6 +34,7 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 protected:
+	EItemState ItemState = EItemState::EIS_Hovering;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sine Parameters")
 	float Amplitude = 2.f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sine Parameters")
@@ -43,7 +44,10 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	UStaticMeshComponent* ItemMesh;
 	UPROPERTY(VisibleAnywhere)
-	class USphereComponent* Sphere;
+	USphereComponent* Sphere;
+
+	template<typename T>
+	T Avg(T First, T Second);
 };
 
 template<typename T>
