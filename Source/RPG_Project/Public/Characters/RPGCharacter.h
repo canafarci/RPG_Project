@@ -14,6 +14,7 @@ class UGroomComponent;
 class AItem;
 class UInputComponent;
 class UAnimMontage;
+class AWeapon;
 
 UCLASS()
 class RPG_PROJECT_API ARPGCharacter : public ACharacter
@@ -39,12 +40,15 @@ protected:
 	void AttackEnd();
 	//--Helper  Functions
 	const bool CanAttack();
+	const bool CanDisarm();
+	const bool CanRearm();
+	const void PlayEquipMontage(FName SectionName);
 
 //VARIABLES
 private:
 	UPROPERTY(VisibleAnywhere)
 		ECharacterEquipState EquipState = ECharacterEquipState::ECES_Unequipped;
-	UPROPERTY(BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 		EActionState ActionState = EActionState::EAS_Unoccupied;
 	UPROPERTY(VisibleAnywhere)
 		USpringArmComponent* CameraBoom;
@@ -56,9 +60,13 @@ private:
 		UGroomComponent* Eyebrows;
 	UPROPERTY(VisibleInstanceOnly)
 		 AItem* OverlappingItem;
+	UPROPERTY(VisibleAnywhere, Category = Weapon)
+		AWeapon* EquippedWeapon;
 	//--Animation Montages
 	UPROPERTY(EditDefaultsOnly, Category = Montages)
 		UAnimMontage* AttackMontage;
+	UPROPERTY(EditDefaultsOnly, Category = Montages)
+		UAnimMontage* EquipMontage;
 
 //GETTERS-SETTERS
 public:

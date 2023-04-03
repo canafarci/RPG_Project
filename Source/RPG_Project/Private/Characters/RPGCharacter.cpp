@@ -10,7 +10,6 @@
 #include "Items/Weapons/Weapon.h"
 #include "Animation/AnimMontage.h"
 
-
 // Sets default values
 ARPGCharacter::ARPGCharacter()
 {
@@ -36,14 +35,12 @@ ARPGCharacter::ARPGCharacter()
 	Eyebrows = CreateDefaultSubobject<UGroomComponent>(TEXT("Eyebrows"));
 	Eyebrows->SetupAttachment(GetMesh());
 	Eyebrows->AttachmentName = FString("head");
-
 }
 
 // Called when the game starts or when spawned
 void ARPGCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	
 }
 
 void ARPGCharacter::MoveForward(float Value)
@@ -71,10 +68,27 @@ void ARPGCharacter::MoveHorizontal(float Value)
 }
 void ARPGCharacter::Equip()
 {
-	AWeapon* Weapon = Cast<AWeapon>(OverlappingItem);
-	if (Weapon == nullptr) return;
-	Weapon->EquipWeapon(GetMesh(), FName("RightHandSocket"));
-	EquipState = Weapon->WeaponEquipState;
+	AWeapon* OverlappingWeapon = Cast<AWeapon>(OverlappingItem);
+	if (OverlappingWeapon) 
+	{
+		OverlappingWeapon->EquipWeapon(GetMesh(), FName("RightHandSocket"));
+		EquipState = OverlappingWeapon->WeaponEquipState;
+		OverlappingItem = nullptr;
+		EquippedWeapon = OverlappingWeapon;
+	}
+	else
+	{
+		if (CanDisarm())
+		{
+			PlayEquipMontage(FName("Unequip"));
+			EquipState = ECharacterEquipState::ECES_Unequipped;
+		}
+		else if (CanRearm())
+		{
+			PlayEquipMontage(FName("Equip"));
+			EquipState = ECharacterEquipState::ECES_EquippedOneHandSword;
+		}
+	}
 
 }
 void ARPGCharacter::Attack()
@@ -96,14 +110,34 @@ void ARPGCharacter::PlayAttackMontage()
 	//play section of the montage
 	AnimInstance->Montage_JumpToSection(FName(SectionName));
 }
+const void ARPGCharacter::PlayEquipMontage(FName SectionName)
+{
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	if (AnimInstance == nullptr || EquipMontage == nullptr) return;
+	AnimInstance->Montage_Play(EquipMontage);
+	AnimInstance->Montage_JumpToSection(SectionName);
+}
 void ARPGCharacter::AttackEnd()
 {
 	ActionState = EActionState::EAS_Unoccupied;
 }
 const bool ARPGCharacter::CanAttack()
 {
-	return ActionState != EActionState::EAS_Attacking && EquipState != ECharacterEquipState::ECES_Unequipped;
+	return (ActionState != EActionState::EAS_Attacking && 
+			EquipState != ECharacterEquipState::ECES_Unequipped);
 }
+const bool ARPGCharacter::CanDisarm()
+{
+	return (EquipState != ECharacterEquipState::ECES_Unequipped &&
+			ActionState == EActionState::EAS_Unoccupied);
+}
+const bool ARPGCharacter::CanRearm()
+{
+	return (ActionState == EActionState::EAS_Unoccupied && 
+			EquipState == ECharacterEquipState::ECES_Unequipped && 
+			EquippedWeapon);
+}
+
 void ARPGCharacter::Turn(float Value)
 {
 	AddControllerYawInput(Value);
