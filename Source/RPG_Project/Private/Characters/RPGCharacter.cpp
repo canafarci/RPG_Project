@@ -134,16 +134,10 @@ void ARPGCharacter::FinishEquipping()
 {
 	ActionState = EActionState::EAS_Unoccupied;
 }
-void ARPGCharacter::DisableWeaponCollision()
+void ARPGCharacter::ToggleWeaponCollision(bool bEnable)
 {
 	if (EquippedWeapon == nullptr) return;
-	EquippedWeapon->ToggleHitCollision(false);
-}
-void ARPGCharacter::EnableWeaponCollision()
-{
-	if (EquippedWeapon == nullptr) return;
-	EquippedWeapon->ToggleHitCollision(true);
-
+	EquippedWeapon->ToggleHitCollision(bEnable);
 }
 void ARPGCharacter::AttackEnd()
 {

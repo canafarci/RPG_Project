@@ -51,9 +51,7 @@ protected:
 	UFUNCTION(BlueprintCallable)
 	void FinishEquipping();
 	UFUNCTION(BlueprintCallable)
-	void DisableWeaponCollision();
-	UFUNCTION(BlueprintCallable)
-	void EnableWeaponCollision();
+	void ToggleWeaponCollision(bool bEnable);
 
 //VARIABLES
 private:
