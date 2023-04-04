@@ -50,6 +50,10 @@ protected:
 	void Rearm();	
 	UFUNCTION(BlueprintCallable)
 	void FinishEquipping();
+	UFUNCTION(BlueprintCallable)
+	void DisableWeaponCollision();
+	UFUNCTION(BlueprintCallable)
+	void EnableWeaponCollision();
 
 //VARIABLES
 private:

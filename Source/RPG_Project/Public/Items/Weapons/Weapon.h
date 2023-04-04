@@ -12,24 +12,37 @@
  */
 
 class USoundBase;
+class UBoxComponent;
 
 UCLASS()
 class RPG_PROJECT_API AWeapon : public AItem
 {
 	GENERATED_BODY()
 public:
+	AWeapon();
 	void EquipWeapon(USceneComponent* InParent, FName InSocketName);
 	void AttachMeshToSocket(USceneComponent* InParent, const FName& InSocketName);
+	void ToggleHitCollision(bool bEnable);
 protected:
+	virtual void BeginPlay() override;
 	//UFUNCTION() needs to be commented as it is inherited from the parent class
 	virtual void OnItemBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) override;
 	virtual void OnItemEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex) override;
-
+	UFUNCTION()
+	void OnBoxOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 	//VARIABLES
 public:
 	UPROPERTY(EditDefaultsOnly)
-		ECharacterEquipState WeaponEquipState;
+	ECharacterEquipState WeaponEquipState;
 private:
 	UPROPERTY(EditDefaultsOnly)
-		USoundBase* SoundCue;
+	USoundBase* SoundCue;
+	UPROPERTY(VisibleAnywhere)
+	UBoxComponent* WeaponBox;
+
+	UPROPERTY(VisibleAnywhere)
+	USceneComponent* BoxTraceStart;
+	UPROPERTY(VisibleAnywhere)
+	USceneComponent* BoxTraceEnd;
+
 };
