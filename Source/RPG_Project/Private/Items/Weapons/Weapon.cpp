@@ -6,9 +6,14 @@
 
 void AWeapon::EquipWeapon(USceneComponent* InParent, FName InSocketName)
 {
-	FAttachmentTransformRules AttachmentRule(EAttachmentRule::SnapToTarget, false);
-	ItemMesh->AttachToComponent(InParent, AttachmentRule, InSocketName);
+	AttachMeshToSocket(InParent, InSocketName);
 	ItemState = EItemState::EIS_Equipped;
+}
+
+void AWeapon::AttachMeshToSocket(USceneComponent* InParent, const FName& InSocketName)
+{
+	FAttachmentTransformRules AttachmentRule(EAttachmentRule::SnapToTarget, true);
+	ItemMesh->AttachToComponent(InParent, AttachmentRule, InSocketName);
 }
 
 void AWeapon::OnItemBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)

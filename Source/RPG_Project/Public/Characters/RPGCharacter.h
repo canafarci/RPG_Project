@@ -44,6 +44,13 @@ protected:
 	const bool CanRearm();
 	const void PlayEquipMontage(FName SectionName);
 
+	UFUNCTION(BlueprintCallable)
+	void Disarm();
+	UFUNCTION(BlueprintCallable)
+	void Rearm();	
+	UFUNCTION(BlueprintCallable)
+	void FinishEquipping();
+
 //VARIABLES
 private:
 	UPROPERTY(VisibleAnywhere)

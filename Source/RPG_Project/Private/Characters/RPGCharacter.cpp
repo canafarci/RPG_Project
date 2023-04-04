@@ -45,7 +45,7 @@ void ARPGCharacter::BeginPlay()
 
 void ARPGCharacter::MoveForward(float Value)
 {	
-	if (ActionState == EActionState::EAS_Attacking) return;
+	if (ActionState != EActionState::EAS_Unoccupied) return;
 	if (Controller && (Value != 0.f))
 	{
 		const FRotator ControlRotation = GetControlRotation();
@@ -57,6 +57,7 @@ void ARPGCharacter::MoveForward(float Value)
 }
 void ARPGCharacter::MoveHorizontal(float Value)
 {
+	if (ActionState != EActionState::EAS_Unoccupied) return;
 	if (Controller && (Value != 0.f))
 	{
 		const FRotator ControlRotation = GetControlRotation();
@@ -82,11 +83,13 @@ void ARPGCharacter::Equip()
 		{
 			PlayEquipMontage(FName("Unequip"));
 			EquipState = ECharacterEquipState::ECES_Unequipped;
+			ActionState = EActionState::EAS_EquippingWeapon;
 		}
 		else if (CanRearm())
 		{
 			PlayEquipMontage(FName("Equip"));
 			EquipState = ECharacterEquipState::ECES_EquippedOneHandSword;
+			ActionState = EActionState::EAS_EquippingWeapon;
 		}
 	}
 
@@ -116,6 +119,20 @@ const void ARPGCharacter::PlayEquipMontage(FName SectionName)
 	if (AnimInstance == nullptr || EquipMontage == nullptr) return;
 	AnimInstance->Montage_Play(EquipMontage);
 	AnimInstance->Montage_JumpToSection(SectionName);
+}
+void ARPGCharacter::Disarm()
+{
+	if (EquippedWeapon == nullptr) return;
+	EquippedWeapon->AttachMeshToSocket(GetMesh(), FName("SpineSocket"));
+}
+void ARPGCharacter::Rearm()
+{
+	if (EquippedWeapon == nullptr) return;
+	EquippedWeapon->AttachMeshToSocket(GetMesh(), FName("RightHandSocket"));
+}
+void ARPGCharacter::FinishEquipping()
+{
+	ActionState = EActionState::EAS_Unoccupied;
 }
 void ARPGCharacter::AttackEnd()
 {

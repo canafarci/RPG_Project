@@ -16,6 +16,7 @@ class RPG_PROJECT_API AWeapon : public AItem
 	GENERATED_BODY()
 public:
 	void EquipWeapon(USceneComponent* InParent, FName InSocketName);
+	void AttachMeshToSocket(USceneComponent* InParent, const FName& InSocketName);
 protected:
 	//UFUNCTION() needs to be commented as it is inherited from the parent class
 	virtual void OnItemBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) override;
