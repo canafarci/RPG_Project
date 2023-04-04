@@ -10,6 +10,9 @@
 /**
  * 
  */
+
+class USoundBase;
+
 UCLASS()
 class RPG_PROJECT_API AWeapon : public AItem
 {
@@ -26,4 +29,7 @@ protected:
 public:
 	UPROPERTY(EditDefaultsOnly)
 		ECharacterEquipState WeaponEquipState;
+private:
+	UPROPERTY(EditDefaultsOnly)
+		USoundBase* SoundCue;
 };
