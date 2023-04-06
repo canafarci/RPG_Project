@@ -9,6 +9,7 @@
 #include "Sound/SoundCue.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include "Interfaces/HitInterface.h"
 
 AWeapon::AWeapon()
 {
@@ -39,8 +40,9 @@ void AWeapon::EquipWeapon(USceneComponent* InParent, FName InSocketName)
 		UGameplayStatics::PlaySoundAtLocation(World, SoundCue, GetActorLocation());
 	}
 
-	if (Sphere ==  nullptr) return
+	if (Sphere == nullptr) return;
 		Sphere->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		Sphere->SetGenerateOverlapEvents(false);
 }
 
 void AWeapon::AttachMeshToSocket(USceneComponent* InParent, const FName& InSocketName)
@@ -56,7 +58,6 @@ void AWeapon::ToggleHitCollision(bool bEnable)
 	else
 		WeaponBox->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 }
-
 
 void AWeapon::OnItemBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
@@ -77,7 +78,9 @@ void AWeapon::OnBoxOverlap(UPrimitiveComponent* OverlappedComponent, AActor* Oth
 	FHitResult OutHit;
 
 	UKismetSystemLibrary::BoxTraceSingle(this, 
-										Start, End, FVector(5.f, 5.f, 5.f),
+										Start, 
+										End, 
+										FVector(5.f, 5.f, 5.f),
 										BoxTraceStart->GetComponentRotation(),
 										ETraceTypeQuery::TraceTypeQuery1,
 										false,
@@ -85,4 +88,13 @@ void AWeapon::OnBoxOverlap(UPrimitiveComponent* OverlappedComponent, AActor* Oth
 										EDrawDebugTrace::ForDuration,
 										OutHit,
 										true);
+	if (OutHit.GetActor())
+	{
+		//UE_LOG(LogTemp, Warning, TEXT("rayimg %s"), *OutHit.);
+		IHitInterface* HitInterface = Cast<IHitInterface>(OutHit.GetActor());
+		if (HitInterface)
+		{
+			HitInterface->GetHit(OutHit.ImpactPoint);
+		}
+	}
 }

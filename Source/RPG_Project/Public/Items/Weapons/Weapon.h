@@ -40,9 +40,9 @@ private:
 	UPROPERTY(VisibleAnywhere)
 	UBoxComponent* WeaponBox;
 
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	USceneComponent* BoxTraceStart;
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	USceneComponent* BoxTraceEnd;
 
 };

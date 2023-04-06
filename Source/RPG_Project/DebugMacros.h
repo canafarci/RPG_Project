@@ -1,7 +1,7 @@
 #pragma once
 #include "DrawDebugHelpers.h"
 //MACROS
-#define DRAW_SPHERE(Location, Radius) if (GetWorld()) DrawDebugSphere(GetWorld(), GetActorLocation(), Radius, 32, FColor::Cyan, true);
+#define DRAW_SPHERE(Location, Radius) if (GetWorld()) DrawDebugSphere(GetWorld(), GetActorLocation(), Radius, 32, FColor::Cyan, false, 2.f);
 #define DRAW_SPHERE_SINGLE(Location, Radius) if (GetWorld()) DrawDebugSphere(GetWorld(), GetActorLocation(), Radius, 32, FColor::Red, false, -1.f);
 #define DRAW_LINE(Start, End) if (GetWorld()) DrawDebugLine(GetWorld(), Start, End, FColor::Magenta, true);
 #define DRAW_LINE_SINGLE(Start, End) if (GetWorld()) DrawDebugLine(GetWorld(), Start, End, FColor::Green, false, -1.f);
