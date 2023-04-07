@@ -15,7 +15,7 @@ AWeapon::AWeapon()
 {
 	WeaponBox = CreateDefaultSubobject<UBoxComponent>(TEXT("Weapon Box"));
 	WeaponBox->SetupAttachment(GetRootComponent());
-	WeaponBox->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	WeaponBox->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 	WeaponBox->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Overlap);
 	WeaponBox->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Ignore);
 
@@ -39,7 +39,6 @@ void AWeapon::EquipWeapon(USceneComponent* InParent, FName InSocketName)
 	{
 		UGameplayStatics::PlaySoundAtLocation(World, SoundCue, GetActorLocation());
 	}
-
 	if (Sphere == nullptr) return;
 		Sphere->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		Sphere->SetGenerateOverlapEvents(false);
@@ -54,9 +53,9 @@ void AWeapon::AttachMeshToSocket(USceneComponent* InParent, const FName& InSocke
 void AWeapon::ToggleHitCollision(bool bEnable)
 {
 	if (bEnable)
-		WeaponBox->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+		WeaponBox->SetGenerateOverlapEvents(true);
 	else
-		WeaponBox->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		WeaponBox->SetGenerateOverlapEvents(false);
 }
 
 void AWeapon::OnItemBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
@@ -90,7 +89,7 @@ void AWeapon::OnBoxOverlap(UPrimitiveComponent* OverlappedComponent, AActor* Oth
 										true);
 	if (OutHit.GetActor())
 	{
-		//UE_LOG(LogTemp, Warning, TEXT("rayimg %s"), *OutHit.);
+		UE_LOG(LogTemp, Warning, TEXT("The Actor's name is %s"), *OutHit.GetActor()->GetName());
 		IHitInterface* HitInterface = Cast<IHitInterface>(OutHit.GetActor());
 		if (HitInterface)
 		{
