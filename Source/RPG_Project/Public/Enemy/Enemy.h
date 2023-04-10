@@ -27,7 +27,8 @@ protected:
 	void PlayHitReactMontage(const FName& SectionName);
 
 private:
-	//Animation Montage
+	void DirectionalHitImpact(const FVector& ImpactPoint);
+	//Animation Montages
 	UPROPERTY(EditDefaultsOnly, Category = Montages)
 	UAnimMontage* HitReactMontage;
 

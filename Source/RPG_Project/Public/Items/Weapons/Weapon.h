@@ -44,5 +44,6 @@ private:
 	USceneComponent* BoxTraceStart;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	USceneComponent* BoxTraceEnd;
+	TArray<AActor*> ActorsToIgnore;
 
 };

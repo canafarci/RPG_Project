@@ -23,6 +23,8 @@ AWeapon::AWeapon()
 	BoxTraceStart->SetupAttachment(GetRootComponent());
 	BoxTraceEnd = CreateDefaultSubobject<USceneComponent>(TEXT("Box Trace End"));
 	BoxTraceEnd->SetupAttachment(GetRootComponent());
+	//initialize actors to ignore list for linetracing
+	ActorsToIgnore.Add(this);
 }
 void AWeapon::BeginPlay()
 {
@@ -55,7 +57,12 @@ void AWeapon::ToggleHitCollision(bool bEnable)
 	if (bEnable)
 		WeaponBox->SetGenerateOverlapEvents(true);
 	else
+	{
 		WeaponBox->SetGenerateOverlapEvents(false);
+		//reset ignored actors list
+		ActorsToIgnore.Empty();
+		ActorsToIgnore.Add(this);
+	}
 }
 
 void AWeapon::OnItemBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
@@ -72,10 +79,8 @@ void AWeapon::OnBoxOverlap(UPrimitiveComponent* OverlappedComponent, AActor* Oth
 {
 	const FVector Start = BoxTraceStart->GetComponentLocation();
 	const FVector End = BoxTraceEnd->GetComponentLocation();
-	TArray<AActor*> ActorsToIgnore;
-	ActorsToIgnore.Add(this);
-	FHitResult OutHit;
 
+	FHitResult OutHit;
 	UKismetSystemLibrary::BoxTraceSingle(this, 
 										Start, 
 										End, 
@@ -94,5 +99,6 @@ void AWeapon::OnBoxOverlap(UPrimitiveComponent* OverlappedComponent, AActor* Oth
 		{
 			HitInterface->GetHit(OutHit.ImpactPoint);
 		}
+		ActorsToIgnore.AddUnique(OutHit.GetActor());
 	}
 }

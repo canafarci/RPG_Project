@@ -18,6 +18,15 @@ void AEnemy::BeginPlay()
 {
 	Super::BeginPlay();
 }
+void AEnemy::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+}
+void AEnemy::GetHit(const FVector& ImpactPoint)
+{
+	DRAW_SPHERE(ImpactPoint, 10.f);
+	DirectionalHitImpact(ImpactPoint);
+}
 void AEnemy::PlayHitReactMontage(const FName& SectionName)
 {
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
@@ -27,25 +36,13 @@ void AEnemy::PlayHitReactMontage(const FName& SectionName)
 	//play section of the montage
 	AnimInstance->Montage_JumpToSection(SectionName, HitReactMontage);
 }
-void AEnemy::Tick(float DeltaTime)
+void AEnemy::DirectionalHitImpact(const FVector& ImpactPoint)
 {
-	Super::Tick(DeltaTime);
-
-}
-void AEnemy::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
-{
-	Super::SetupPlayerInputComponent(PlayerInputComponent);
-
-}
-void AEnemy::GetHit(const FVector& ImpactPoint)
-{
-	DRAW_SPHERE(ImpactPoint, 10.f);
-
 	const FVector Forward = GetActorForwardVector();
 	//Equalize Z positions
 	const FVector ImpactLower(ImpactPoint.X, ImpactPoint.Y, GetActorLocation().Z);
 	const FVector ToHit = (ImpactLower - GetActorLocation()).GetSafeNormal();
-	
+
 	const double CosTheta = FVector::DotProduct(Forward, ToHit);
 	//calculate inverse cosine of cos(theta) to calculate theta
 	double Theta = FMath::Acos(CosTheta);
@@ -57,7 +54,6 @@ void AEnemy::GetHit(const FVector& ImpactPoint)
 	{
 		Theta *= -1.f;
 	}
-
 	//Decide hit direction
 	FName Section("FromBack");
 	if (Theta >= -45.f && Theta < 45.f)
@@ -75,5 +71,8 @@ void AEnemy::GetHit(const FVector& ImpactPoint)
 
 	UKismetSystemLibrary::DrawDebugArrow(this, GetActorLocation(), GetActorLocation() + Forward * 60.f, 5.0, FColor::Orange, 5.f);
 	UKismetSystemLibrary::DrawDebugArrow(this, GetActorLocation(), GetActorLocation() + ToHit * 60.f, 5.0, FColor::Magenta, 5.f);
-
+}
+void AEnemy::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
+{
+	Super::SetupPlayerInputComponent(PlayerInputComponent);
 }
