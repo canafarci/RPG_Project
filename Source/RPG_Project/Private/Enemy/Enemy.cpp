@@ -40,7 +40,6 @@ void AEnemy::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 void AEnemy::GetHit(const FVector& ImpactPoint)
 {
 	DRAW_SPHERE(ImpactPoint, 10.f);
-	PlayHitReactMontage(FName("FromLeft"));
 
 	const FVector Forward = GetActorForwardVector();
 	//Equalize Z positions
@@ -58,10 +57,22 @@ void AEnemy::GetHit(const FVector& ImpactPoint)
 	{
 		Theta *= -1.f;
 	}
+
+	//Decide hit direction
+	FName Section("FromBack");
+	if (Theta >= -45.f && Theta < 45.f)
+		Section = FName("FromFront");
+	else if (Theta >= 45.f && Theta < 135.f)
+		Section = FName("FromRight");
+	else if (Theta < -45.f && Theta >= -135.f)
+		Section = FName("FromLeft");
+
+	PlayHitReactMontage(Section);
+
 	UKismetSystemLibrary::DrawDebugArrow(this, GetActorLocation(), GetActorLocation() + CrossProduct * 60.f, 5.0, FColor::Blue, 5.f);
 
-	if (GEngine)
-		GEngine->AddOnScreenDebugMessage(1, 5.f, FColor::Green, FString::Printf(TEXT("Theta: %f"), Theta));
+	UE_LOG(LogTemp, Warning, TEXT("Theta is : %f, Direction is : %s"), Theta, *Section.ToString());
+
 	UKismetSystemLibrary::DrawDebugArrow(this, GetActorLocation(), GetActorLocation() + Forward * 60.f, 5.0, FColor::Orange, 5.f);
 	UKismetSystemLibrary::DrawDebugArrow(this, GetActorLocation(), GetActorLocation() + ToHit * 60.f, 5.0, FColor::Magenta, 5.f);
 

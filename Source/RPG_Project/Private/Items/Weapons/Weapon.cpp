@@ -89,7 +89,6 @@ void AWeapon::OnBoxOverlap(UPrimitiveComponent* OverlappedComponent, AActor* Oth
 										true);
 	if (OutHit.GetActor())
 	{
-		UE_LOG(LogTemp, Warning, TEXT("The Actor's name is %s"), *OutHit.GetActor()->GetName());
 		IHitInterface* HitInterface = Cast<IHitInterface>(OutHit.GetActor());
 		if (HitInterface)
 		{
