@@ -25,10 +25,12 @@ void AEnemy::Tick(float DeltaTime)
 }
 void AEnemy::GetHit(const FVector& ImpactPoint)
 {
-	DRAW_SPHERE(ImpactPoint, 10.f);
+	//DRAW_SPHERE(ImpactPoint, 10.f);
 	DirectionalHitImpact(ImpactPoint);
 	if (HitSound)
 		UGameplayStatics::PlaySoundAtLocation(this, HitSound, ImpactPoint);
+	if (HitParticle)
+		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), HitParticle, ImpactPoint);
 }
 void AEnemy::PlayHitReactMontage(const FName& SectionName)
 {
@@ -67,13 +69,10 @@ void AEnemy::DirectionalHitImpact(const FVector& ImpactPoint)
 		Section = FName("FromLeft");
 
 	PlayHitReactMontage(Section);
-
-	UKismetSystemLibrary::DrawDebugArrow(this, GetActorLocation(), GetActorLocation() + CrossProduct * 60.f, 5.0, FColor::Blue, 5.f);
-
-	UE_LOG(LogTemp, Warning, TEXT("Theta is : %f, Direction is : %s"), Theta, *Section.ToString());
-
-	UKismetSystemLibrary::DrawDebugArrow(this, GetActorLocation(), GetActorLocation() + Forward * 60.f, 5.0, FColor::Orange, 5.f);
-	UKismetSystemLibrary::DrawDebugArrow(this, GetActorLocation(), GetActorLocation() + ToHit * 60.f, 5.0, FColor::Magenta, 5.f);
+	//UKismetSystemLibrary::DrawDebugArrow(this, GetActorLocation(), GetActorLocation() + CrossProduct * 60.f, 5.0, FColor::Blue, 5.f);
+	//UE_LOG(LogTemp, Warning, TEXT("Theta is : %f, Direction is : %s"), Theta, *Section.ToString());
+	//UKismetSystemLibrary::DrawDebugArrow(this, GetActorLocation(), GetActorLocation() + Forward * 60.f, 5.0, FColor::Orange, 5.f);
+	//UKismetSystemLibrary::DrawDebugArrow(this, GetActorLocation(), GetActorLocation() + ToHit * 60.f, 5.0, FColor::Magenta, 5.f);
 }
 void AEnemy::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
