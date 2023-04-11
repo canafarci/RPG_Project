@@ -6,6 +6,7 @@
 #include "BreakableActor.generated.h"
 
 class UGeometryCollectionComponent;
+class ATreasure;
 
 UCLASS()
 class RPG_PROJECT_API ABreakableActor : public AActor, public IHitInterface
@@ -22,5 +23,8 @@ public:
 private:
 	UPROPERTY(VisibleAnywhere)
 	UGeometryCollectionComponent* GeometryCollection;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<ATreasure> TreasureClass;
 
 };
