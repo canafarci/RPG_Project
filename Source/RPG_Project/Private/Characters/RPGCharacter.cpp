@@ -192,18 +192,10 @@ void ARPGCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 	Input->BindAction(JumpAction, ETriggerEvent::Triggered, this, &ACharacter::Jump);
 	Input->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
 	Input->BindAction(MoveForwardAction, ETriggerEvent::Triggered, this, &ARPGCharacter::MoveForward);
+	Input->BindAction(MoveHorizontalAction, ETriggerEvent::Triggered, this, &ARPGCharacter::MoveHorizontal);
 	Input->BindAction(LookVerticalAction, ETriggerEvent::Triggered, this, &ARPGCharacter::LookVertical);
 	Input->BindAction(TurnAction, ETriggerEvent::Triggered, this, &ARPGCharacter::Turn);
 	Input->BindAction(EquipAction, ETriggerEvent::Triggered, this, &ARPGCharacter::Equip);
 	Input->BindAction(AttackAction, ETriggerEvent::Triggered, this, &ARPGCharacter::Attack);
-	//Old input System
-	/*Super::SetupPlayerInputComponent(PlayerInputComponent);
-	PlayerInputComponent->BindAxis(FName("MoveForward"), this, &ARPGCharacter::MoveForward);
-	PlayerInputComponent->BindAxis(FName("MoveHorizontal"), this, &ARPGCharacter::MoveHorizontal);
-	PlayerInputComponent->BindAxis(FName("Turn"), this, &ARPGCharacter::Turn);
-	PlayerInputComponent->BindAxis(FName("LookUp"), this, &ARPGCharacter::LookUp);
-	PlayerInputComponent->BindAction(FName("Jump"), IE_Pressed, this, &ACharacter::Jump);
-	PlayerInputComponent->BindAction(FName("Equip"), IE_Pressed, this, &ARPGCharacter::Equip);
-	PlayerInputComponent->BindAction(FName("Attack"), IE_Pressed, this, &ARPGCharacter::Attack);*/
 }
 

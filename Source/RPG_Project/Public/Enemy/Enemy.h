@@ -9,6 +9,7 @@
 
 class UAnimMontage;
 class UAttributeComponent;
+class UWidgetComponent;
 
 
 UCLASS()
@@ -33,6 +34,8 @@ private:
 	//VARIABLES
 	UPROPERTY(VisibleAnywhere)
 	UAttributeComponent* Attributes;
+	UPROPERTY(VisibleAnywhere)
+	UWidgetComponent* HealthBarWidget;
 	UPROPERTY(EditAnywhere, Category = Sounds)
 	USoundBase* HitSound;
 	UPROPERTY(EditAnywhere, Category = VisualEffects)
