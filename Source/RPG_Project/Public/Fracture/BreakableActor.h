@@ -23,8 +23,7 @@ public:
 private:
 	UPROPERTY(VisibleAnywhere)
 	UGeometryCollectionComponent* GeometryCollection;
-
 	UPROPERTY(EditAnywhere)
-	TSubclassOf<ATreasure> TreasureClass;
-
+	TArray< TSubclassOf<ATreasure>> TreasureClasses;
+	bool bBroken = false;
 };

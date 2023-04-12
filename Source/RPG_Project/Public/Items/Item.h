@@ -9,6 +9,7 @@
 
 //Forward Declarations
 class USphereComponent;
+class UNiagaraComponent;
 
 UCLASS()
 class RPG_PROJECT_API AItem : public AActor
@@ -45,13 +46,8 @@ protected:
 	UStaticMeshComponent* ItemMesh;
 	UPROPERTY(VisibleAnywhere)
 	USphereComponent* Sphere;
-
-	template<typename T>
-	T Avg(T First, T Second);
+	UPROPERTY(EditAnywhere)
+	UNiagaraComponent* ItemEffect;
 };
 
-template<typename T>
-inline T AItem::Avg(T First, T Second)
-{
-	return (First + Second) / 2;
-}
+

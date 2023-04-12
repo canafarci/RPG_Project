@@ -14,11 +14,13 @@ ABreakableActor::ABreakableActor()
 
 void ABreakableActor::GetHit_Implementation(const FVector& ImpactPoint)
 {
+	if (bBroken) return;
+	bBroken = true;
 	GeometryCollection->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Ignore);
 	UWorld* World = GetWorld();
-	if (!World || !TreasureClass) return;
-
-	World->SpawnActor<ATreasure>(TreasureClass, GetActorLocation(), GetActorRotation());
+	if (!World || TreasureClasses.Num() < 1) return;
+	int32 RandomElement = FMath::FRandRange(0, TreasureClasses.Num() - 1);
+	World->SpawnActor<ATreasure>(TreasureClasses[RandomElement], GetActorLocation(), GetActorRotation());
 }
 void ABreakableActor::BeginPlay()
 {

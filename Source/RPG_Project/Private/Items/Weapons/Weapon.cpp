@@ -10,6 +10,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "Interfaces/HitInterface.h"
+#include "NiagaraComponent.h"
 
 AWeapon::AWeapon()
 {
@@ -41,9 +42,13 @@ void AWeapon::EquipWeapon(USceneComponent* InParent, FName InSocketName)
 	{
 		UGameplayStatics::PlaySoundAtLocation(World, SoundCue, GetActorLocation());
 	}
-	if (Sphere == nullptr) return;
+	if (Sphere)
+	{
 		Sphere->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		Sphere->SetGenerateOverlapEvents(false);
+	}
+	if (ItemEffect)
+		ItemEffect->Deactivate();
 }
 
 void AWeapon::AttachMeshToSocket(USceneComponent* InParent, const FName& InSocketName)
@@ -81,9 +86,9 @@ void AWeapon::OnBoxOverlap(UPrimitiveComponent* OverlappedComponent, AActor* Oth
 	const FVector End = BoxTraceEnd->GetComponentLocation();
 
 	FHitResult OutHit;
-	UKismetSystemLibrary::BoxTraceSingle(this, 
-										Start, 
-										End, 
+	UKismetSystemLibrary::BoxTraceSingle(this,
+										Start,
+										End,
 										FVector(5.f, 5.f, 5.f),
 										BoxTraceStart->GetComponentRotation(),
 										ETraceTypeQuery::TraceTypeQuery1,

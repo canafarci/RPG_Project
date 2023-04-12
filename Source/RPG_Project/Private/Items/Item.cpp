@@ -5,6 +5,8 @@
 #include "RPG_PROJECT/DebugMacros.h"
 #include "Components/SphereComponent.h"
 #include "Characters/RPGCharacter.h"
+#include "NiagaraComponent.h"
+
 // Sets default values
 AItem::AItem()
 {
@@ -16,6 +18,9 @@ AItem::AItem()
 
 	Sphere= CreateDefaultSubobject<USphereComponent>(TEXT("Sphere Collider"));
 	Sphere->SetupAttachment(GetRootComponent());
+
+	ItemEffect = CreateDefaultSubobject<UNiagaraComponent>(TEXT("Particle Effect"));
+	ItemEffect->SetupAttachment(GetRootComponent());
 }
 
 // Called when the game starts or when spawned
