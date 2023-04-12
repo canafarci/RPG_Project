@@ -9,6 +9,9 @@
 #include "Items/Item.h"
 #include "Items/Weapons/Weapon.h"
 #include "Animation/AnimMontage.h"
+#include "EnhancedInputComponent.h"
+#include "InputMappingContext.h"
+#include "EnhancedInputSubsystems.h"
 
 // Sets default values
 ARPGCharacter::ARPGCharacter()
@@ -41,33 +44,40 @@ ARPGCharacter::ARPGCharacter()
 void ARPGCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+
+	//Add Enhanced Input Mapping Context
+	if (APlayerController* PlayerController = Cast<APlayerController>(Controller))
+		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
+			Subsystem->AddMappingContext(InputMappingContext, 0);
 }
 
-void ARPGCharacter::MoveForward(float Value)
+void ARPGCharacter::MoveForward(const FInputActionValue& Value)
 {	
+	float MovementFloat = Value.Get<float>();
 	if (ActionState != EActionState::EAS_Unoccupied) return;
-	if (Controller && (Value != 0.f))
+	if (Controller && (MovementFloat != 0.f))
 	{
 		const FRotator ControlRotation = GetControlRotation();
 		const FRotator YawRotation(0.f, ControlRotation.Yaw, 0.f);
 		//get local forward direction of controller using 3d rotation matrix
 		const FVector Direction =  FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
-		AddMovementInput(Direction, Value);
+		AddMovementInput(Direction, MovementFloat);
 	}
 }
-void ARPGCharacter::MoveHorizontal(float Value)
+void ARPGCharacter::MoveHorizontal(const FInputActionValue& Value)
 {
+	float MovementFloat = Value.Get<float>();
 	if (ActionState != EActionState::EAS_Unoccupied) return;
-	if (Controller && (Value != 0.f))
+	if (Controller && (MovementFloat != 0.f))
 	{
 		const FRotator ControlRotation = GetControlRotation();
 		const FRotator YawRotation(0.f, ControlRotation.Yaw, 0.f);
 		//get local right direction of controller using 3d rotation matrix
 		const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
-		AddMovementInput(Direction, Value);
+		AddMovementInput(Direction, MovementFloat);
 	}
 }
-void ARPGCharacter::Equip()
+void ARPGCharacter::Equip(const FInputActionValue& Value)
 {
 	AWeapon* OverlappingWeapon = Cast<AWeapon>(OverlappingItem);
 	if (OverlappingWeapon) 
@@ -92,9 +102,8 @@ void ARPGCharacter::Equip()
 			ActionState = EActionState::EAS_EquippingWeapon;
 		}
 	}
-
 }
-void ARPGCharacter::Attack()
+void ARPGCharacter::Attack(const FInputActionValue& Value)
 {
 	if (!CanAttack()) return;
 	PlayAttackMontage();
@@ -160,30 +169,41 @@ const bool ARPGCharacter::CanRearm()
 			EquippedWeapon);
 }
 
-void ARPGCharacter::Turn(float Value)
+void ARPGCharacter::Turn(const FInputActionValue& Value)
 {
-	AddControllerYawInput(Value);
+	float TurnFloat = Value.Get<float>();
+	AddControllerYawInput(TurnFloat);
 }
 
-void ARPGCharacter::LookUp(float Value)
+void ARPGCharacter::LookVertical(const FInputActionValue& Value)
 {
-	AddControllerPitchInput(Value);
+	float LookVerticalFloat = Value.Get<float>();
+	AddControllerPitchInput(LookVerticalFloat);
 }
-// Called every frame
 void ARPGCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 }
-// Called to bind functionality to input
 void ARPGCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
-	Super::SetupPlayerInputComponent(PlayerInputComponent);
+	
+	UEnhancedInputComponent* Input = Cast<UEnhancedInputComponent>(PlayerInputComponent);
+
+	Input->BindAction(JumpAction, ETriggerEvent::Triggered, this, &ACharacter::Jump);
+	Input->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
+	Input->BindAction(MoveForwardAction, ETriggerEvent::Triggered, this, &ARPGCharacter::MoveForward);
+	Input->BindAction(LookVerticalAction, ETriggerEvent::Triggered, this, &ARPGCharacter::LookVertical);
+	Input->BindAction(TurnAction, ETriggerEvent::Triggered, this, &ARPGCharacter::Turn);
+	Input->BindAction(EquipAction, ETriggerEvent::Triggered, this, &ARPGCharacter::Equip);
+	Input->BindAction(AttackAction, ETriggerEvent::Triggered, this, &ARPGCharacter::Attack);
+	//Old input System
+	/*Super::SetupPlayerInputComponent(PlayerInputComponent);
 	PlayerInputComponent->BindAxis(FName("MoveForward"), this, &ARPGCharacter::MoveForward);
 	PlayerInputComponent->BindAxis(FName("MoveHorizontal"), this, &ARPGCharacter::MoveHorizontal);
 	PlayerInputComponent->BindAxis(FName("Turn"), this, &ARPGCharacter::Turn);
 	PlayerInputComponent->BindAxis(FName("LookUp"), this, &ARPGCharacter::LookUp);
 	PlayerInputComponent->BindAction(FName("Jump"), IE_Pressed, this, &ACharacter::Jump);
 	PlayerInputComponent->BindAction(FName("Equip"), IE_Pressed, this, &ARPGCharacter::Equip);
-	PlayerInputComponent->BindAction(FName("Attack"), IE_Pressed, this, &ARPGCharacter::Attack);
+	PlayerInputComponent->BindAction(FName("Attack"), IE_Pressed, this, &ARPGCharacter::Attack);*/
 }
 

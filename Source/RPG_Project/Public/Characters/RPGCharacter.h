@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "RPG_Project/Enums.h"
+#include "InputActionValue.h"
 #include "RPGCharacter.generated.h"
 
 //Forward declarations
@@ -15,6 +16,9 @@ class AItem;
 class UInputComponent;
 class UAnimMontage;
 class AWeapon;
+//class UEnhancedInputComponent;
+class UInputAction;
+class UInputMappingContext;
 
 UCLASS()
 class RPG_PROJECT_API ARPGCharacter : public ACharacter
@@ -28,12 +32,12 @@ public:
 protected:
 	virtual void BeginPlay() override;
 	//--Callbacks for input
-	void MoveForward(float Value);
-	void Turn(float Value);
-	void LookUp(float Value);
-	void MoveHorizontal(float Value);
-	void Equip();
-	void Attack();
+	void MoveForward(const FInputActionValue& Value);
+	void MoveHorizontal(const FInputActionValue& Value);
+	void Turn(const FInputActionValue& Value);
+	void LookVertical(const FInputActionValue& Value);
+	void Equip(const FInputActionValue& Value);
+	void Attack(const FInputActionValue& Value);
 	//--Play montage functions
 	void PlayAttackMontage();
 	UFUNCTION(BlueprintCallable)
@@ -76,6 +80,24 @@ private:
 		UAnimMontage* AttackMontage;
 	UPROPERTY(EditDefaultsOnly, Category = Montages)
 		UAnimMontage* EquipMontage;
+protected:
+	//----//ENHANCED INPUT
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Enhanced Input")
+		UInputMappingContext* InputMappingContext;
+	UPROPERTY(EditDefaultsOnly, Category = "Enhanced Input")
+		UInputAction* JumpAction;
+	UPROPERTY(EditDefaultsOnly, Category = "Enhanced Input")
+		UInputAction* MoveForwardAction;
+	UPROPERTY(EditDefaultsOnly, Category = "Enhanced Input")
+		UInputAction* MoveHorizontalAction;
+	UPROPERTY(EditDefaultsOnly, Category = "Enhanced Input")
+		UInputAction* TurnAction;
+	UPROPERTY(EditDefaultsOnly, Category = "Enhanced Input")
+		UInputAction* LookVerticalAction;
+	UPROPERTY(EditDefaultsOnly, Category = "Enhanced Input")
+		UInputAction* EquipAction;
+	UPROPERTY(EditDefaultsOnly, Category = "Enhanced Input")
+		UInputAction* AttackAction;
 
 //GETTERS-SETTERS
 public:
