@@ -8,6 +8,7 @@
 #include "Enemy.generated.h"
 
 class UAnimMontage;
+class UAttributeComponent;
 
 
 UCLASS()
@@ -30,6 +31,8 @@ private:
 	//FUNCTIONS
 	void DirectionalHitImpact(const FVector& ImpactPoint);
 	//VARIABLES
+	UPROPERTY(VisibleAnywhere)
+	UAttributeComponent* Attributes;
 	UPROPERTY(EditAnywhere, Category = Sounds)
 	USoundBase* HitSound;
 	UPROPERTY(EditAnywhere, Category = VisualEffects)
