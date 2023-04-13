@@ -10,7 +10,7 @@
 class UAnimMontage;
 class UAttributeComponent;
 class UWidgetComponent;
-
+class UHealthBarComponent;
 
 UCLASS()
 class RPG_PROJECT_API AEnemy : public ACharacter, public IHitInterface
@@ -22,6 +22,7 @@ public:
 	virtual void Tick(float DeltaTime) override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	virtual void GetHit_Implementation(const FVector& ImpactPoint) override;
+	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
 
 protected:
 	virtual void BeginPlay() override;
@@ -35,7 +36,7 @@ private:
 	UPROPERTY(VisibleAnywhere)
 	UAttributeComponent* Attributes;
 	UPROPERTY(VisibleAnywhere)
-	UWidgetComponent* HealthBarWidget;
+	UHealthBarComponent* HealthBarWidgetComponent;
 	UPROPERTY(EditAnywhere, Category = Sounds)
 	USoundBase* HitSound;
 	UPROPERTY(EditAnywhere, Category = VisualEffects)
@@ -43,4 +44,5 @@ private:
 	//----//Animation Montages
 	UPROPERTY(EditDefaultsOnly, Category = Montages)
 	UAnimMontage* HitReactMontage;
+
 };

@@ -44,37 +44,46 @@ ARPGCharacter::ARPGCharacter()
 void ARPGCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-
 	//Add Enhanced Input Mapping Context
 	if (APlayerController* PlayerController = Cast<APlayerController>(Controller))
 		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
 			Subsystem->AddMappingContext(InputMappingContext, 0);
 }
+void ARPGCharacter::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
 
-void ARPGCharacter::MoveForward(const FInputActionValue& Value)
-{	
-	float MovementFloat = Value.Get<float>();
-	if (ActionState != EActionState::EAS_Unoccupied) return;
-	if (Controller && (MovementFloat != 0.f))
+	if (ActionState == EActionState::EAS_Attacking)
 	{
-		const FRotator ControlRotation = GetControlRotation();
-		const FRotator YawRotation(0.f, ControlRotation.Yaw, 0.f);
-		//get local forward direction of controller using 3d rotation matrix
-		const FVector Direction =  FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
-		AddMovementInput(Direction, MovementFloat);
+		FRotator CurrentRotation = GetActorRotation();
+		FRotator NewRotation = FMath::RInterpTo(CurrentRotation, DesiredRotation, DeltaTime, InterpolationSpeed);
+		SetActorRotation(NewRotation);
 	}
 }
-void ARPGCharacter::MoveHorizontal(const FInputActionValue& Value)
-{
-	float MovementFloat = Value.Get<float>();
+void ARPGCharacter::Move(const FInputActionValue& Value)
+{	
+	FVector2D MovementVector = Value.Get<FVector2D>();
 	if (ActionState != EActionState::EAS_Unoccupied) return;
-	if (Controller && (MovementFloat != 0.f))
+	if (Controller && (MovementVector != FVector2D::ZeroVector))
 	{
-		const FRotator ControlRotation = GetControlRotation();
-		const FRotator YawRotation(0.f, ControlRotation.Yaw, 0.f);
-		//get local right direction of controller using 3d rotation matrix
-		const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
-		AddMovementInput(Direction, MovementFloat);
+		float VerticalInput = MovementVector.Y;
+		float HorizontalInput = MovementVector.X;
+		if (VerticalInput != 0.0f)
+		{
+			const FRotator ControlRotation = GetControlRotation();
+			const FRotator YawRotation(0.f, ControlRotation.Yaw, 0.f);
+			//get local forward direction of controller using 3d rotation matrix
+			const FVector Direction =  FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
+			AddMovementInput(Direction, VerticalInput);
+		}
+		if (HorizontalInput != 0.0f)
+		{
+			const FRotator ControlRotation = GetControlRotation();
+			const FRotator YawRotation(0.f, ControlRotation.Yaw, 0.f);
+			//get local right direction of controller using 3d rotation matrix
+			const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
+			AddMovementInput(Direction, HorizontalInput);
+		}
 	}
 }
 void ARPGCharacter::Equip(const FInputActionValue& Value)
@@ -82,7 +91,7 @@ void ARPGCharacter::Equip(const FInputActionValue& Value)
 	AWeapon* OverlappingWeapon = Cast<AWeapon>(OverlappingItem);
 	if (OverlappingWeapon) 
 	{
-		OverlappingWeapon->EquipWeapon(GetMesh(), FName("RightHandSocket"));
+		OverlappingWeapon->EquipWeapon(GetMesh(), FName("RightHandSocket"), this, this);
 		EquipState = OverlappingWeapon->WeaponEquipState;
 		OverlappingItem = nullptr;
 		EquippedWeapon = OverlappingWeapon;
@@ -105,7 +114,13 @@ void ARPGCharacter::Equip(const FInputActionValue& Value)
 }
 void ARPGCharacter::Attack(const FInputActionValue& Value)
 {
-	if (!CanAttack()) return;
+	if (!CanAttack() || !Controller) return;
+	const FRotator ControlRotation = GetControlRotation();
+	const FRotator YawRotation(0.f, ControlRotation.Yaw, 0.f);
+	//get local right direction of controller using 3d rotation matrix
+	const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
+	DesiredRotation = YawRotation;
+
 	PlayAttackMontage();
 	ActionState = EActionState::EAS_Attacking;
 }
@@ -169,20 +184,11 @@ const bool ARPGCharacter::CanRearm()
 			EquippedWeapon);
 }
 
-void ARPGCharacter::Turn(const FInputActionValue& Value)
+void ARPGCharacter::Look(const FInputActionValue& Value)
 {
-	float TurnFloat = Value.Get<float>();
-	AddControllerYawInput(TurnFloat);
-}
-
-void ARPGCharacter::LookVertical(const FInputActionValue& Value)
-{
-	float LookVerticalFloat = Value.Get<float>();
-	AddControllerPitchInput(LookVerticalFloat);
-}
-void ARPGCharacter::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
+	FVector2D LookVector = Value.Get<FVector2D>();
+	AddControllerYawInput(LookVector.X);
+	AddControllerPitchInput(LookVector.Y);
 }
 void ARPGCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
@@ -191,11 +197,8 @@ void ARPGCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 
 	Input->BindAction(JumpAction, ETriggerEvent::Triggered, this, &ACharacter::Jump);
 	Input->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
-	Input->BindAction(MoveForwardAction, ETriggerEvent::Triggered, this, &ARPGCharacter::MoveForward);
-	Input->BindAction(MoveHorizontalAction, ETriggerEvent::Triggered, this, &ARPGCharacter::MoveHorizontal);
-	Input->BindAction(LookVerticalAction, ETriggerEvent::Triggered, this, &ARPGCharacter::LookVertical);
-	Input->BindAction(TurnAction, ETriggerEvent::Triggered, this, &ARPGCharacter::Turn);
-	Input->BindAction(EquipAction, ETriggerEvent::Triggered, this, &ARPGCharacter::Equip);
+	Input->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ARPGCharacter::Move);
+	Input->BindAction(LookAction, ETriggerEvent::Triggered, this, &ARPGCharacter::Look);
+	Input->BindAction(EquipAction, ETriggerEvent::Completed, this, &ARPGCharacter::Equip);
 	Input->BindAction(AttackAction, ETriggerEvent::Triggered, this, &ARPGCharacter::Attack);
 }
-

@@ -7,6 +7,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Components/AttributeComponent.h"
 #include "Components/WidgetComponent.h"
+#include "HUD/HealthBarComponent.h"
 
 AEnemy::AEnemy()
 {
@@ -18,12 +19,14 @@ AEnemy::AEnemy()
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Camera, ECollisionResponse::ECR_Ignore);
 
 	Attributes = CreateDefaultSubobject<UAttributeComponent>(TEXT("Attributes"));
-	HealthBarWidget= CreateDefaultSubobject<UWidgetComponent>(TEXT("HealthBar"));
-	HealthBarWidget->SetupAttachment(GetRootComponent());
+	HealthBarWidgetComponent = CreateDefaultSubobject<UHealthBarComponent>(TEXT("HealthBar"));
+	HealthBarWidgetComponent->SetupAttachment(GetRootComponent());
 }
 void AEnemy::BeginPlay()
 {
 	Super::BeginPlay();
+	if (HealthBarWidgetComponent)
+		HealthBarWidgetComponent->SetHealthPercent(Attributes->GetHealthPercent());
 }
 void AEnemy::Tick(float DeltaTime)
 {
@@ -31,12 +34,20 @@ void AEnemy::Tick(float DeltaTime)
 }
 void AEnemy::GetHit_Implementation(const FVector& ImpactPoint)
 {
-	//DRAW_SPHERE(ImpactPoint, 10.f);
 	DirectionalHitImpact(ImpactPoint);
 	if (HitSound)
 		UGameplayStatics::PlaySoundAtLocation(this, HitSound, ImpactPoint);
 	if (HitParticle)
 		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), HitParticle, ImpactPoint);
+}
+float AEnemy::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+{
+	if (Attributes && HealthBarWidgetComponent)
+	{
+		Attributes->ReceiveDamage(DamageAmount);
+		HealthBarWidgetComponent->SetHealthPercent(Attributes->GetHealthPercent());
+	}
+	return DamageAmount;
 }
 void AEnemy::PlayHitReactMontage(const FName& SectionName)
 {
@@ -62,9 +73,7 @@ void AEnemy::DirectionalHitImpact(const FVector& ImpactPoint)
 	//if cross p is pointing up, theta is positive, and ToHit is to the right of Forward
 	const FVector CrossProduct = FVector::CrossProduct(Forward, ToHit);
 	if (CrossProduct.Z < 0)
-	{
 		Theta *= -1.f;
-	}
 	//Decide hit direction
 	FName Section("FromBack");
 	if (Theta >= -45.f && Theta < 45.f)

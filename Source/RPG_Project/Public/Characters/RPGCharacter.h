@@ -32,10 +32,8 @@ public:
 protected:
 	virtual void BeginPlay() override;
 	//--Callbacks for input
-	void MoveForward(const FInputActionValue& Value);
-	void MoveHorizontal(const FInputActionValue& Value);
-	void Turn(const FInputActionValue& Value);
-	void LookVertical(const FInputActionValue& Value);
+	void Move(const FInputActionValue& Value);
+	void Look(const FInputActionValue& Value);
 	void Equip(const FInputActionValue& Value);
 	void Attack(const FInputActionValue& Value);
 	//--Play montage functions
@@ -59,6 +57,9 @@ protected:
 
 //VARIABLES
 private:
+	UPROPERTY(EditAnywhere)
+		float InterpolationSpeed;
+	FRotator DesiredRotation;
 	UPROPERTY(VisibleAnywhere)
 		ECharacterEquipState EquipState = ECharacterEquipState::ECES_Unequipped;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
@@ -87,13 +88,9 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Enhanced Input")
 		UInputAction* JumpAction;
 	UPROPERTY(EditDefaultsOnly, Category = "Enhanced Input")
-		UInputAction* MoveForwardAction;
+		UInputAction* MoveAction;
 	UPROPERTY(EditDefaultsOnly, Category = "Enhanced Input")
-		UInputAction* MoveHorizontalAction;
-	UPROPERTY(EditDefaultsOnly, Category = "Enhanced Input")
-		UInputAction* TurnAction;
-	UPROPERTY(EditDefaultsOnly, Category = "Enhanced Input")
-		UInputAction* LookVerticalAction;
+		UInputAction* LookAction;
 	UPROPERTY(EditDefaultsOnly, Category = "Enhanced Input")
 		UInputAction* EquipAction;
 	UPROPERTY(EditDefaultsOnly, Category = "Enhanced Input")

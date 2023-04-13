@@ -20,7 +20,7 @@ class RPG_PROJECT_API AWeapon : public AItem
 	GENERATED_BODY()
 public:
 	AWeapon();
-	void EquipWeapon(USceneComponent* InParent, FName InSocketName);
+	void EquipWeapon(USceneComponent* InParent, FName InSocketName, AActor* NewOwner, APawn* NewInstigator);
 	void AttachMeshToSocket(USceneComponent* InParent, const FName& InSocketName);
 	void ToggleHitCollision(bool bEnable);
 protected:
@@ -36,15 +36,16 @@ public:
 	UPROPERTY(EditDefaultsOnly)
 	ECharacterEquipState WeaponEquipState;
 private:
-	UPROPERTY(EditDefaultsOnly)
-	USoundBase* SoundCue;
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(EditDefaultsOnly, Category = "Weapon Properties")
+	USoundBase* EquipSound;
+	UPROPERTY(VisibleAnywhere, Category = "Weapon Properties")
 	UBoxComponent* WeaponBox;
+	UPROPERTY(VisibleAnywhere, Category = "Weapon Properties")
+	float Damage = 20.f;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	USceneComponent* BoxTraceStart;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	USceneComponent* BoxTraceEnd;
 	TArray<AActor*> ActorsToIgnore;
-
 };
