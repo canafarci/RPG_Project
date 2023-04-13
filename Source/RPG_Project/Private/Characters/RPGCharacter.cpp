@@ -22,6 +22,27 @@ ARPGCharacter::ARPGCharacter()
 	bUseControllerRotationYaw = false;
 	bUseControllerRotationRoll = false;
 
+	SetupComponents();
+}
+
+
+// Called when the game starts or when spawned
+void ARPGCharacter::BeginPlay()
+{
+	Super::BeginPlay();
+	//Add Enhanced Input Mapping Context
+	if (APlayerController* PlayerController = Cast<APlayerController>(Controller))
+		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
+			Subsystem->AddMappingContext(InputMappingContext, 0);
+}
+void ARPGCharacter::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+	TurnPlayerOnAttackState(DeltaTime);
+}
+void ARPGCharacter::SetupComponents()
+{
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 	GetCharacterMovement()->RotationRate = FRotator(0.f, 400.f, 0.f);
 
@@ -39,26 +60,12 @@ ARPGCharacter::ARPGCharacter()
 	Eyebrows->SetupAttachment(GetMesh());
 	Eyebrows->AttachmentName = FString("head");
 }
-
-// Called when the game starts or when spawned
-void ARPGCharacter::BeginPlay()
+void ARPGCharacter::TurnPlayerOnAttackState(float DeltaTime)
 {
-	Super::BeginPlay();
-	//Add Enhanced Input Mapping Context
-	if (APlayerController* PlayerController = Cast<APlayerController>(Controller))
-		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
-			Subsystem->AddMappingContext(InputMappingContext, 0);
-}
-void ARPGCharacter::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
-	if (ActionState == EActionState::EAS_Attacking)
-	{
-		FRotator CurrentRotation = GetActorRotation();
-		FRotator NewRotation = FMath::RInterpTo(CurrentRotation, DesiredRotation, DeltaTime, InterpolationSpeed);
-		SetActorRotation(NewRotation);
-	}
+	if (ActionState != EActionState::EAS_Attacking) return;
+	FRotator CurrentRotation = GetActorRotation();
+	FRotator NewRotation = FMath::RInterpTo(CurrentRotation, DesiredRotation, DeltaTime, InterpolationSpeed);
+	SetActorRotation(NewRotation);
 }
 void ARPGCharacter::Move(const FInputActionValue& Value)
 {	
@@ -132,7 +139,7 @@ void ARPGCharacter::PlayAttackMontage()
 	AnimInstance->Montage_Play(AttackMontage);
 	//randomize which part of the montage is to be played
 	FString SectionName = FString("Attack");
-	int32 Selection = FMath::RandRange(1, 5);
+	int32 Selection = FMath::RandRange(1, AttackMontage->GetNumSections());
 	SectionName.AppendInt(Selection);
 	//play section of the montage
 	AnimInstance->Montage_JumpToSection(FName(SectionName));

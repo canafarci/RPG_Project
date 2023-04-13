@@ -99,12 +99,19 @@ void AWeapon::OnBoxOverlap(UPrimitiveComponent* OverlappedComponent, AActor* Oth
 										EDrawDebugTrace::None,
 										OutHit,
 										true);
-	if (OutHit.GetActor())
+
+	if (AActor* HitActor = OutHit.GetActor())
 	{
-		IHitInterface* HitInterface = Cast<IHitInterface>(OutHit.GetActor());
-		if (HitInterface)
+		UGameplayStatics::ApplyDamage(
+									HitActor,
+									Damage,
+									GetInstigator()->GetController(),
+									this,
+									UDamageType::StaticClass());
+
+		if (IHitInterface* HitInterface = Cast<IHitInterface>(HitActor))
 		{
-			HitInterface->Execute_GetHit(OutHit.GetActor(), OutHit.ImpactPoint);
+			HitInterface->Execute_GetHit(HitActor, OutHit.ImpactPoint);
 		}
 		ActorsToIgnore.AddUnique(OutHit.GetActor());
 
@@ -114,12 +121,5 @@ void AWeapon::OnBoxOverlap(UPrimitiveComponent* OverlappedComponent, AActor* Oth
 			CreateFields(OutHit.ImpactPoint);
 		}
 
-		UGameplayStatics::ApplyDamage(
-									OutHit.GetActor(),
-									Damage,
-									GetInstigator()->GetController(),
-									this,
-									UDamageType::StaticClass()																
-		);
 	}
 }

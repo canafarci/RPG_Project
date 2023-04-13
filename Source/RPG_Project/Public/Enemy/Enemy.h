@@ -27,22 +27,27 @@ public:
 protected:
 	virtual void BeginPlay() override;
 	//Play Montage Functions
-	void PlayHitReactMontage(const FName& SectionName);
+	void PlayMontage(const FName& SectionName, UAnimMontage* Montage);
+	void Die();
 
 private:
 	//FUNCTIONS
 	void DirectionalHitImpact(const FVector& ImpactPoint);
 	//VARIABLES
 	UPROPERTY(VisibleAnywhere)
-	UAttributeComponent* Attributes;
+		UAttributeComponent* Attributes;
 	UPROPERTY(VisibleAnywhere)
-	UHealthBarComponent* HealthBarWidgetComponent;
+		UHealthBarComponent* HealthBarWidgetComponent;
 	UPROPERTY(EditAnywhere, Category = Sounds)
-	USoundBase* HitSound;
+		USoundBase* HitSound;
 	UPROPERTY(EditAnywhere, Category = VisualEffects)
-	UParticleSystem* HitParticle;
+		UParticleSystem* HitParticle;
+	//-------------------------------------------------------
 	//----//Animation Montages
+	//-------------------------------------------------------
 	UPROPERTY(EditDefaultsOnly, Category = Montages)
-	UAnimMontage* HitReactMontage;
+		UAnimMontage* HitReactMontage;
+	UPROPERTY(EditDefaultsOnly, Category = Montages)
+		UAnimMontage* DeathMontage;
 
 };

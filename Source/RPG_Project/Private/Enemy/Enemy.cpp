@@ -34,11 +34,18 @@ void AEnemy::Tick(float DeltaTime)
 }
 void AEnemy::GetHit_Implementation(const FVector& ImpactPoint)
 {
-	DirectionalHitImpact(ImpactPoint);
-	if (HitSound)
-		UGameplayStatics::PlaySoundAtLocation(this, HitSound, ImpactPoint);
-	if (HitParticle)
-		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), HitParticle, ImpactPoint);
+	if (Attributes && Attributes->IsAlive())
+	{
+		DirectionalHitImpact(ImpactPoint);
+		if (HitSound)
+			UGameplayStatics::PlaySoundAtLocation(this, HitSound, ImpactPoint);
+		if (HitParticle)
+			UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), HitParticle, ImpactPoint);
+	}
+	else
+	{
+		Die();
+	}
 }
 float AEnemy::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
@@ -49,14 +56,16 @@ float AEnemy::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AC
 	}
 	return DamageAmount;
 }
-void AEnemy::PlayHitReactMontage(const FName& SectionName)
+void AEnemy::Die()
 {
-	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-	if (AnimInstance == nullptr || HitReactMontage == nullptr) return;
-	//play montage
-	AnimInstance->Montage_Play(HitReactMontage);
-	//play section of the montage
-	AnimInstance->Montage_JumpToSection(SectionName, HitReactMontage);
+	//Get suffix of end animation by getting a rand int between 1 and total number of sections
+	int32 RandomSection = FMath::FRandRange(1, DeathMontage->GetNumSections());
+	//Add the prefix
+	FString SectionName("Death");
+	//add the suffix
+	SectionName.AppendInt(RandomSection);
+	//Convert to FName and call the function
+	PlayMontage(FName(SectionName), DeathMontage);
 }
 void AEnemy::DirectionalHitImpact(const FVector& ImpactPoint)
 {
@@ -83,11 +92,20 @@ void AEnemy::DirectionalHitImpact(const FVector& ImpactPoint)
 	else if (Theta < -45.f && Theta >= -135.f)
 		Section = FName("FromLeft");
 
-	PlayHitReactMontage(Section);
+	PlayMontage(Section, HitReactMontage);
 	//UKismetSystemLibrary::DrawDebugArrow(this, GetActorLocation(), GetActorLocation() + CrossProduct * 60.f, 5.0, FColor::Blue, 5.f);
 	//UE_LOG(LogTemp, Warning, TEXT("Theta is : %f, Direction is : %s"), Theta, *Section.ToString());
 	//UKismetSystemLibrary::DrawDebugArrow(this, GetActorLocation(), GetActorLocation() + Forward * 60.f, 5.0, FColor::Orange, 5.f);
 	//UKismetSystemLibrary::DrawDebugArrow(this, GetActorLocation(), GetActorLocation() + ToHit * 60.f, 5.0, FColor::Magenta, 5.f);
+}
+void AEnemy::PlayMontage(const FName& SectionName, UAnimMontage* Montage)
+{
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	if (AnimInstance == nullptr || Montage == nullptr) return;
+	//play montage
+	AnimInstance->Montage_Play(Montage);
+	//play section of the montage
+	AnimInstance->Montage_JumpToSection(SectionName, Montage);
 }
 void AEnemy::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
