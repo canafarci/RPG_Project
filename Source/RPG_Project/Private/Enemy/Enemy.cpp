@@ -8,6 +8,8 @@
 #include "Components/AttributeComponent.h"
 #include "Components/WidgetComponent.h"
 #include "HUD/HealthBarComponent.h"
+#include "Animation/AnimInstance.h"
+#include "Animation/AnimMontage.h"
 
 AEnemy::AEnemy()
 {
@@ -106,6 +108,39 @@ void AEnemy::PlayMontage(const FName& SectionName, UAnimMontage* Montage)
 	AnimInstance->Montage_Play(Montage);
 	//play section of the montage
 	AnimInstance->Montage_JumpToSection(SectionName, Montage);
+	if (Montage == DeathMontage)
+	{
+		DeathSectionName = SectionName;
+		FAnimMontageInstance* MontageInstance = AnimInstance->GetActiveMontageInstance();
+		if (MontageInstance)
+		{
+			MontageInstance->OnMontageBlendingOutStarted.BindUObject(this, &AEnemy::OnDeathMontageBlendingOut);
+		}
+	}
+}
+
+void AEnemy::OnDeathMontageBlendingOut(UAnimMontage* Montage, bool bInterrupted)
+{
+	if (!bInterrupted && Montage == DeathMontage)
+	{
+		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+		
+		if (AnimInstance)
+		{
+				int32 SectionIndex = DeathMontage->GetSectionIndex(DeathSectionName);
+				float SectionStart;
+				float SectionEnd;
+				DeathMontage->GetSectionStartAndEndTime(SectionIndex, SectionStart, SectionEnd);
+
+				AnimInstance->Montage_Play(DeathMontage);
+				AnimInstance->Montage_JumpToSection(DeathSectionName, DeathMontage);
+				AnimInstance->Montage_SetPosition(
+												DeathMontage,	
+												SectionStart + DeathMontage->GetSectionLength(SectionIndex) - KINDA_SMALL_NUMBER);
+
+				AnimInstance->Montage_SetPlayRate(DeathMontage, 0.0f);
+		}
+	}
 }
 void AEnemy::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {

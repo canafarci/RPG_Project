@@ -33,6 +33,7 @@ protected:
 private:
 	//FUNCTIONS
 	void DirectionalHitImpact(const FVector& ImpactPoint);
+	void OnDeathMontageBlendingOut(UAnimMontage* Montage, bool bInterrupted);
 	//VARIABLES
 	UPROPERTY(VisibleAnywhere)
 		UAttributeComponent* Attributes;
@@ -45,6 +46,7 @@ private:
 	//-------------------------------------------------------
 	//----//Animation Montages
 	//-------------------------------------------------------
+	FName DeathSectionName;
 	UPROPERTY(EditDefaultsOnly, Category = Montages)
 		UAnimMontage* HitReactMontage;
 	UPROPERTY(EditDefaultsOnly, Category = Montages)
