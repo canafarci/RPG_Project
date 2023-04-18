@@ -27,15 +27,31 @@ AEnemy::AEnemy()
 void AEnemy::BeginPlay()
 {
 	Super::BeginPlay();
+
 	if (HealthBarWidgetComponent)
+	{
 		HealthBarWidgetComponent->SetHealthPercent(Attributes->GetHealthPercent());
+		HealthBarWidgetComponent->SetVisibility(false);
+	}
 }
 void AEnemy::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	if (CombatTarget == nullptr || HealthBarWidgetComponent == nullptr) return;
+
+	const double DistanceToTarget = (CombatTarget->GetActorLocation() - GetActorLocation()).Size();
+
+	if (DistanceToTarget > CombatRadius)
+	{
+		HealthBarWidgetComponent->SetVisibility(false);
+		CombatTarget = nullptr;
+	}
 }
 void AEnemy::GetHit_Implementation(const FVector& ImpactPoint)
 {
+	if (HealthBarWidgetComponent)
+		HealthBarWidgetComponent->SetVisibility(true);
+
 	if (Attributes && Attributes->IsAlive())
 	{
 		DirectionalHitImpact(ImpactPoint);
@@ -44,10 +60,9 @@ void AEnemy::GetHit_Implementation(const FVector& ImpactPoint)
 		if (HitParticle)
 			UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), HitParticle, ImpactPoint);
 	}
+
 	else
-	{
 		Die();
-	}
 }
 float AEnemy::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
@@ -56,6 +71,8 @@ float AEnemy::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AC
 		Attributes->ReceiveDamage(DamageAmount);
 		HealthBarWidgetComponent->SetHealthPercent(Attributes->GetHealthPercent());
 	}
+	CombatTarget = EventInstigator->GetPawn();
+
 	return DamageAmount;
 }
 void AEnemy::Die()
@@ -68,6 +85,12 @@ void AEnemy::Die()
 	SectionName.AppendInt(RandomSection);
 	//Convert to FName and call the function
 	PlayMontage(FName(SectionName), DeathMontage);
+
+	//Disable colliders and cleanup after death
+	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	SetLifeSpan(5.f);
+	if (HealthBarWidgetComponent)
+		HealthBarWidgetComponent->SetVisibility(false);
 }
 void AEnemy::DirectionalHitImpact(const FVector& ImpactPoint)
 {

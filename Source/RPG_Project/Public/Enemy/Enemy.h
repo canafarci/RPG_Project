@@ -43,13 +43,18 @@ private:
 		USoundBase* HitSound;
 	UPROPERTY(EditAnywhere, Category = VisualEffects)
 		UParticleSystem* HitParticle;
-	//-------------------------------------------------------
+	//----//Combat
+	UPROPERTY()
+		AActor* CombatTarget;
 	//----//Animation Montages
-	//-------------------------------------------------------
 	FName DeathSectionName;
 	UPROPERTY(EditDefaultsOnly, Category = Montages)
 		UAnimMontage* HitReactMontage;
 	UPROPERTY(EditDefaultsOnly, Category = Montages)
 		UAnimMontage* DeathMontage;
+	//----//AI
+	UPROPERTY(EditAnywhere)
+		double CombatRadius = 500;
+
 
 };
